@@ -22,3 +22,5 @@ logs/
 
 .github/
 src/lib/firebase.ts
+.agents
+.claude
