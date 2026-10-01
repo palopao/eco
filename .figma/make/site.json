@@ -1,0 +1,10 @@
+{
+  "description": "Discover, log, and review music with a sleek social platform that connects fans through ratings, reviews, and personalized activity feeds.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
