@@ -1,0 +1,5 @@
+requests
+pyarrow
+tqdm
+lxml
+isal
