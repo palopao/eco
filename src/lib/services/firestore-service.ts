@@ -46,32 +46,33 @@ function mergeReviews(...groups: Review[][]): Review[] {
 }
 
 export const albumService = {
-  async getAlbums(limitCount = 60): Promise<Album[]> {
-    return catalogService.getRecentAlbums(limitCount);
+  async getAlbums(limitCount = 60, signal?: AbortSignal): Promise<Album[]> {
+    return catalogService.getRecentAlbums(limitCount, signal);
   },
 
-  async getAlbumsByIds(ids: string[]): Promise<Album[]> {
-    return catalogService.getAlbumsByIds(ids);
+  async getAlbumsByIds(ids: string[], signal?: AbortSignal): Promise<Album[]> {
+    return catalogService.getAlbumsByIds(ids, signal);
   },
 
-  getAlbumById(id: string): Promise<Album | null> {
-    return catalogService.getAlbumById(id);
+  getAlbumById(id: string, signal?: AbortSignal): Promise<Album | null> {
+    return catalogService.getAlbumById(id, signal);
   },
 
   searchAlbums(
     searchText: string,
     filters?: { decade?: string; year?: string; genre?: string },
-    offsetCount = 0
+    offsetCount = 0,
+    signal?: AbortSignal
   ): Promise<Album[]> {
-    return catalogService.searchAlbums(searchText, 30, offsetCount, filters);
+    return catalogService.searchAlbums(searchText, 30, offsetCount, filters, signal);
   },
 
-  async getAlbumsByArtist(artist: string, limitCount = 50, offsetCount = 0): Promise<Album[]> {
-    return catalogService.getAlbumsByArtist(artist, limitCount, offsetCount);
+  async getAlbumsByArtist(artist: string, limitCount = 50, offsetCount = 0, signal?: AbortSignal): Promise<Album[]> {
+    return catalogService.getAlbumsByArtist(artist, limitCount, offsetCount, signal);
   },
 
-  searchTracks(searchText: string): Promise<TrackSearchResult[]> {
-    return catalogService.searchTracks(searchText);
+  searchTracks(searchText: string, signal?: AbortSignal): Promise<TrackSearchResult[]> {
+    return catalogService.searchTracks(searchText, 30, signal);
   },
 };
 

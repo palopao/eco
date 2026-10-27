@@ -2,8 +2,12 @@ import type { Album, Track, TrackSearchResult } from "../../types";
 
 const catalogApiUrl = (import.meta.env.VITE_CATALOG_API_URL || "/api/catalog").replace(/\/$/, "");
 
-async function requestCatalog(path: string): Promise<unknown> {
-  const response = await fetch(`${catalogApiUrl}${path}`);
+async function requestCatalog(path: string, signal?: AbortSignal): Promise<unknown> {
+  const controller = new AbortController();
+  const abortSignal = signal ?? controller.signal;
+  const timeout = setTimeout(() => controller.abort(), 30000);
+  const response = await fetch(`${catalogApiUrl}${path}`, { signal: abortSignal });
+  clearTimeout(timeout);
   const data: unknown = await response.json();
   if (!response.ok) {
     const message =
@@ -84,31 +88,31 @@ function parseTrackSearchResult(value: unknown): TrackSearchResult {
 }
 
 export const catalogService = {
-  async getRecentAlbums(limitCount = 60): Promise<Album[]> {
-    const data = await requestCatalog(`/albums?limit=${limitCount}`);
+  async getRecentAlbums(limitCount = 60, signal?: AbortSignal): Promise<Album[]> {
+    const data = await requestCatalog(`/albums?limit=${limitCount}`, signal);
     if (!Array.isArray(data)) throw new Error("The catalog API returned an invalid album list.");
     return data.map(parseAlbum);
   },
 
-  async getAlbumsByIds(ids: string[]): Promise<Album[]> {
+  async getAlbumsByIds(ids: string[], signal?: AbortSignal): Promise<Album[]> {
     const uniqueIds = [...new Set(ids)].filter(Boolean);
     const albums: Album[] = [];
     for (let index = 0; index < uniqueIds.length; index += 100) {
       const batch = uniqueIds.slice(index, index + 100);
-      const data = await requestCatalog(`/albums-by-id?ids=${batch.map(encodeURIComponent).join(",")}`);
+      const data = await requestCatalog(`/albums-by-id?ids=${batch.map(encodeURIComponent).join(",")}`, signal);
       if (!Array.isArray(data)) throw new Error("The catalog API returned an invalid album list.");
       albums.push(...data.map(parseAlbum));
     }
     return albums;
   },
 
-  async getAlbumById(id: string): Promise<Album | null> {
-    const data = await requestCatalog(`/album?id=${encodeURIComponent(id)}`);
+  async getAlbumById(id: string, signal?: AbortSignal): Promise<Album | null> {
+    const data = await requestCatalog(`/album?id=${encodeURIComponent(id)}`, signal);
     return data === null ? null : parseAlbum(data);
   },
 
-  async getTracksByAlbum(albumId: string): Promise<Track[]> {
-    const data = await requestCatalog(`/tracks?albumId=${encodeURIComponent(albumId)}`);
+  async getTracksByAlbum(albumId: string, signal?: AbortSignal): Promise<Track[]> {
+    const data = await requestCatalog(`/tracks?albumId=${encodeURIComponent(albumId)}`, signal);
     if (!Array.isArray(data)) throw new Error("The catalog API returned an invalid track list.");
     return data.map(parseTrack);
   },
@@ -117,26 +121,27 @@ export const catalogService = {
     query: string,
     limitCount = 30,
     offsetCount = 0,
-    filters?: { decade?: string; year?: string; genre?: string }
+    filters?: { decade?: string; year?: string; genre?: string },
+    signal?: AbortSignal
   ): Promise<Album[]> {
     const params = new URLSearchParams({ kind: "albums", q: query, limit: String(limitCount), offset: String(offsetCount) });
     if (filters?.decade) params.set("decade", filters.decade);
     if (filters?.year) params.set("year", filters.year);
     if (filters?.genre) params.set("genre", filters.genre);
-    const data = await requestCatalog(`/search?${params.toString()}`);
+    const data = await requestCatalog(`/search?${params.toString()}`, signal);
     if (!Array.isArray(data)) throw new Error("The catalog API returned an invalid album search result.");
     return data.map(parseAlbum);
   },
 
-  async getAlbumsByArtist(artist: string, limitCount = 50, offsetCount = 0): Promise<Album[]> {
+  async getAlbumsByArtist(artist: string, limitCount = 50, offsetCount = 0, signal?: AbortSignal): Promise<Album[]> {
     const params = new URLSearchParams({ artist, limit: String(limitCount), offset: String(offsetCount) });
-    const data = await requestCatalog(`/albums-by-artist?${params.toString()}`);
+    const data = await requestCatalog(`/albums-by-artist?${params.toString()}`, signal);
     if (!Array.isArray(data)) throw new Error("The catalog API returned an invalid artist album list.");
     return data.map(parseAlbum);
   },
 
-  async searchTracks(query: string, limitCount = 30): Promise<TrackSearchResult[]> {
-    const data = await requestCatalog(`/search?kind=tracks&q=${encodeURIComponent(query)}&limit=${limitCount}`);
+  async searchTracks(query: string, limitCount = 30, signal?: AbortSignal): Promise<TrackSearchResult[]> {
+    const data = await requestCatalog(`/search?kind=tracks&q=${encodeURIComponent(query)}&limit=${limitCount}`, signal);
     if (!Array.isArray(data)) throw new Error("The catalog API returned an invalid track search result.");
     return data.map(parseTrackSearchResult);
   },

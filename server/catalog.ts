@@ -145,7 +145,10 @@ export function searchAlbums(
 ): any[] {
   const q = query.toLowerCase();
   const results: any[] = [];
+  const MAX_RESULTS_PER_DB = 500;
+  const MAX_TOTAL_RESULTS = 2000;
   for (const dbPath of getDbFiles()) {
+    if (results.length >= MAX_TOTAL_RESULTS) break;
     const db = openReadonly(dbPath);
     try {
       let sql = `SELECT * FROM albums WHERE 1=1`;
@@ -167,7 +170,9 @@ export function searchAlbums(
         sql += ` AND LOWER(genres) LIKE ?`;
         params.push(`%${filters.genre.toLowerCase()}%`);
       }
-      const rows = db.prepare(sql).all(...params) as AlbumRow[];
+      sql += ` ORDER BY releaseDate DESC LIMIT ?`;
+      const remaining = Math.min(MAX_RESULTS_PER_DB, MAX_TOTAL_RESULTS - results.length);
+      const rows = db.prepare(sql).all(...params, remaining) as AlbumRow[];
       for (const row of rows) {
         results.push(albumToDict(row));
       }
@@ -176,10 +181,13 @@ export function searchAlbums(
     }
   }
   const ranked = results.sort((a, b) => {
+    // Primary: reverse chronological order (most recent first)
+    const dateCompare = (b.releaseDate ?? "").localeCompare(a.releaseDate ?? "");
+    if (dateCompare !== 0) return dateCompare;
+    // Secondary: relevance score within the same date
     const aScore = relevanceScore(a, q);
     const bScore = relevanceScore(b, q);
-    if (bScore !== aScore) return bScore - aScore;
-    return (b.releaseDate ?? "").localeCompare(a.releaseDate ?? "");
+    return bScore - aScore;
   });
   return ranked.slice(offsetCount, offsetCount + limitCount);
 }
@@ -216,10 +224,13 @@ export function getAlbumsByArtist(artist: string, limitCount = 50, offsetCount =
 export function searchTracks(query: string, limitCount = 30) {
   const q = query.toLowerCase();
   const results: any[] = [];
+  const MAX_RESULTS_PER_DB = 500;
+  const MAX_TOTAL_RESULTS = 2000;
   for (const dbPath of getDbFiles()) {
+    if (results.length >= MAX_TOTAL_RESULTS) break;
     const db = openReadonly(dbPath);
     try {
-      const rows = db.prepare(`SELECT * FROM albums`).all() as AlbumRow[];
+      const rows = db.prepare(`SELECT * FROM albums LIMIT ?`).all(MAX_RESULTS_PER_DB) as AlbumRow[];
       for (const row of rows) {
         const trackTitles = parseTracks(row.tracks);
         for (let i = 0; i < trackTitles.length; i++) {
@@ -234,14 +245,15 @@ export function searchTracks(query: string, limitCount = 30) {
               artist: album.artist,
               year: album.year,
             });
-            if (results.length >= limitCount) return results;
+            if (results.length >= MAX_TOTAL_RESULTS) break;
           }
         }
+        if (results.length >= MAX_TOTAL_RESULTS) break;
       }
     } finally {
       db.close();
     }
-    if (results.length >= limitCount) break;
+    if (results.length >= MAX_TOTAL_RESULTS) break;
   }
-  return results;
+  return results.slice(0, limitCount);
 }
