@@ -34,7 +34,7 @@ export function HomeScreen({
             {albums.map((album) => (
               <AlbumTile key={album.id} album={album} onClick={openAlbum} />
             ))}
-            {albums.length === 0 && <p className="screen-heading">The local catalog is empty. Run the MusicBrainz importer to add albums.</p>}
+            {albums.length === 0 && <p className="empty-state">The local catalog is empty. Run the MusicBrainz importer to add albums.</p>}
           </div>
         </section>
 
@@ -58,7 +58,7 @@ export function HomeScreen({
               <div className="review-footer"><span>{review.likesCount ?? 0} likes</span><span>{review.isRewatch ? "Re-listen" : "First listen"}</span></div>
             </article>;
           })}
-          {reviews.length === 0 && <p className="screen-heading">Community reviews will appear here.</p>}
+          {reviews.length === 0 && <p className="empty-state">Community reviews will appear here.</p>}
         </section>
       </main>
     </>

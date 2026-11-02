@@ -32,7 +32,7 @@ export function ProfileScreen({
     .filter((album): album is Album => Boolean(album));
   return (
     <>
-      <AppHeader onHome={() => {}} title={user?.displayName ?? "Profile"} action={<button className="header-icon-button" aria-label="Settings" onClick={openSettings}><Icon name="gear" /></button>} />
+      <AppHeader onHome={onHome} title={user?.displayName ?? "Profile"} action={<button className="header-icon-button" aria-label="Settings" onClick={openSettings}><Icon name="gear" /></button>} />
       <main className="profile-page">
         <section className="profile-header">
           <div className="profile-person">
@@ -69,13 +69,13 @@ export function ProfileScreen({
               <div><span>{album.artist}</span><strong>{album.title}</strong><Stars value={review.rating} /><p>{review.textContent ?? review.content}</p><div><span><Icon name="heart" size={16} /> {review.likesCount ?? review.likes ?? 0}</span><button onClick={() => openShare(review)}><Icon name="share" size={16} /> Share</button></div></div>
             </article>;
           })}
-          {reviews.length === 0 && <p className="screen-heading">You have not reviewed an album yet.</p>}
+          {reviews.length === 0 && <p className="empty-state">You have not reviewed an album yet.</p>}
         </section>}
         {tab === "lists" && <section className="profile-lists">
           {lists.map((list) => (
             <article key={list.id}><div className="mini-stack">{(list.albumIds ?? []).slice(0, 2).map((id: string) => albums.find((album) => album.id === id)).filter((album): album is Album => Boolean(album)).map((album) => <img key={album.id} src={album.coverUrl} alt="" />)}</div><strong>{list.title}</strong><span>{list.albumIds?.length ?? list.albums?.length ?? 0} albums</span></article>
           ))}
-          {lists.length === 0 && <p className="screen-heading">You have not created a list yet.</p>}
+          {lists.length === 0 && <p className="empty-state">You have not created a list yet.</p>}
         </section>}
         {tab === "stats" && <section className="stats-dashboard">
           <div className="metric-row"><div><strong>{new Set(reviews.map((review) => review.albumId)).size}</strong><span>Albums logged</span></div><div><strong>{reviews.length}</strong><span>Diary entries</span></div><div><strong>{reviews.length ? (reviews.reduce((sum: number, review: Review) => sum + review.rating, 0) / reviews.length).toFixed(1) : "—"}</strong><span>Avg rating</span></div></div>

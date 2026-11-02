@@ -122,12 +122,14 @@ export const catalogService = {
     limitCount = 30,
     offsetCount = 0,
     filters?: { decade?: string; year?: string; genre?: string },
+    searchField?: string,
     signal?: AbortSignal
   ): Promise<Album[]> {
     const params = new URLSearchParams({ kind: "albums", q: query, limit: String(limitCount), offset: String(offsetCount) });
     if (filters?.decade) params.set("decade", filters.decade);
     if (filters?.year) params.set("year", filters.year);
     if (filters?.genre) params.set("genre", filters.genre);
+    if (searchField) params.set("field", searchField);
     const data = await requestCatalog(`/search?${params.toString()}`, signal);
     if (!Array.isArray(data)) throw new Error("The catalog API returned an invalid album search result.");
     return data.map(parseAlbum);

@@ -154,7 +154,7 @@ export default function RegisterScreen({ setScreen }: { setScreen: (s: "home" | 
           {imageLoading && <span>Processing image...</span>}
         </div>
 
-        {error && <p role="alert" className="error-text" style={{ color: "red", fontSize: "0.875rem", marginBottom: "1rem" }}>{error}</p>}
+        {error && <p role="alert" className="error-text">{error}</p>}
 
         <button className="publish-button" disabled={loading || imageLoading}>
           {imageLoading ? "Processing photo..." : loading ? "Creating account..." : "Create Account"}

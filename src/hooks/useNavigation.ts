@@ -21,11 +21,12 @@ export function useNavigation({ initialScreen = "home" }: UseNavigationOptions =
   const [navHistory, setNavHistory] = useState<string[]>([]);
 
   const pushScreen = useCallback((next: Screen, from?: string) => {
-    if (from && from !== next) {
-      setNavHistory((prev) => (prev.includes(from) ? prev : [...prev, from]));
+    const fromScreen = from ?? screen;
+    if (fromScreen && fromScreen !== next) {
+      setNavHistory((prev) => (prev.includes(fromScreen) ? prev : [...prev, fromScreen]));
     }
     setScreen(next);
-  }, []);
+  }, [screen]);
 
   const goBack = useCallback(() => {
     const last = navHistory[navHistory.length - 1];

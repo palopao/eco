@@ -69,12 +69,6 @@ button:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2p
 .artist-avatar { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #d946ef); display: grid; place-items: center; font-weight: 700; font-size: 20px; color: white; }
 .artist-header h1 { font-size: 24px; margin: 0 0 3px; letter-spacing: -.5px; }
 .artist-header p { margin: 0; color: var(--cyan); font-size: 12px; }
-.artist-albums-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; padding: 0 16px 24px; }
-.artist-album-tile { border: 0; background: none; padding: 0; text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: 8px; }
-.artist-album-tile .cover-wrap { width: 100%; height: 0; aspect-ratio: 1; position: relative; margin: 0; }
-.artist-album-tile .cover-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; border: 1px solid #ffffff14; }
-.artist-album-tile strong { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
-.artist-album-tile span { color: var(--text-2); font-size: 11px; }
 .load-more-container { padding: 24px 16px; text-align: center; }
 
 /* Collapsible section */
@@ -297,7 +291,7 @@ textarea::placeholder { color: #58677d; }
 .release-timeline strong { font-size: 11px; margin-top: 8px; }
 .release-timeline small { color: var(--text-2); font-size: 9px; margin-top: 3px; }
 .result-section { margin-bottom: 28px; }
-.search-albums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; padding: 0 16px; }
+.search-albums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 0 16px; }
 .search-albums button { min-width: 0; border: 0; background: none; padding: 0; text-align: left; cursor: pointer; }
 .search-albums img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; }
 .search-albums strong, .search-albums span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -345,8 +339,38 @@ textarea::placeholder { color: #58677d; }
 .search-list-results strong { font-size: 10px; }
 .search-list-results small { color: var(--text-3); font-size: 7px; margin-top: 5px; }
 
-/* Filters */
-.filter-sheet, .list-creator { width: min(100%, 430px); max-height: 94vh; overflow-y: auto; background: var(--surface-2); border: 1px solid #2b3b5a; border-bottom: 0; border-radius: 25px 25px 0 0; padding: 8px 20px calc(24px + env(safe-area-inset-bottom)); box-shadow: 0 -20px 60px #00000080; animation: rise .3s cubic-bezier(.2,.8,.2,1); }
+/* Edit profile favorite editor - searchable album list */
+.added-albums { margin-top: 9px; border: 1px solid var(--border); background: #0d1525; border-radius: 12px; overflow: hidden; max-height: 300px; overflow-y: auto; }
+.added-albums > div { height: 57px; display: grid; grid-template-columns: 48px 1fr 22px; gap: 8px; align-items: center; padding: 0 10px; border-bottom: 1px solid var(--border); color: var(--text-3); cursor: pointer; }
+.added-albums > div:last-child { border: 0; }
+.added-albums > div:hover { background: #141c2e; }
+.added-albums > div.selected { background: #173a70; color: white; }
+.added-albums > div.selected strong { color: white; }
+.added-albums > div.selected small { color: #a5b4c4; }
+.added-albums img { width: 38px; height: 38px; border-radius: 6px; object-fit: cover; }
+.added-albums p { margin: 0; }
+.added-albums strong { color: white; font-size: 10px; }
+.added-albums small { font-size: 7px; margin-top: 3px; }
+.added-albums button { border: 0; background: none; color: var(--text-3); padding: 0; }
+
+/* Selected favorites chips */
+.selected-favorites { margin-top: 16px; padding: 0 10px; }
+.selected-favorites strong { display: block; font-size: 10px; color: var(--text-2); margin-bottom: 8px; }
+.selected-favorites-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.selected-favorite-chip { height: 32px; display: flex; align-items: center; gap: 6px; padding: 0 8px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface-2); cursor: pointer; }
+.selected-favorite-chip img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
+.selected-favorite-chip span { font-size: 10px; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+.selected-favorite-chip svg { color: var(--text-3); }
+
+/* Search in favorite editor */
+.favorite-editor .add-search { margin-top: 12px; }
+
+/* Error messages */
+.error-text { display: flex; align-items: center; gap: 8px; margin: 12px 0; padding: 12px 16px; border-radius: 12px; background: #2a1218; border: 1px solid #5a2028; color: #fca5a5; font-size: 13px; font-weight: 500; line-height: 1.4; animation: fade .2s ease-out; }
+.error-text::before { content: "⚠"; font-size: 16px; flex-shrink: 0; }
+/* Empty state messages */
+.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 32px 16px; text-align: center; color: var(--text-3); font-size: 13px; }
+.empty-state::before { content: "♪"; font-size: 28px; color: var(--text-3); opacity: .5; }
 .filter-title, .share-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 17px; }
 .filter-title span, .share-top span { color: var(--cyan); font-size: 8px; letter-spacing: 1.3px; font-weight: 700; }
 .filter-title h2, .share-top h2 { margin: 3px 0 0; font-size: 18px; letter-spacing: -.4px; }
@@ -657,13 +681,15 @@ textarea::placeholder { color: #58677d; }
     padding-inline: 24px;
   }
   .search-page > .search-header,
+  .search-page > .active-filters-bar,
+  .search-page > .error-text,
   .search-page > .discovery-filters,
   .search-page > .release-calendar { grid-column: 1 / -1; }
   .search-header { position: sticky; }
   .global-search { margin-inline: 0; }
   .discovery-filters { padding-inline: 0; flex-wrap: wrap; }
-  .search-page > section:not(.release-calendar) { min-width: 0; }
-  .search-page .section-title { padding-inline: 0; }
+.search-page > section:not(.release-calendar) { min-width: 0; grid-column: 1 / -1; }
+.search-page .section-title { padding-inline: 0; }
   .search-albums { grid-template-columns: repeat(3, minmax(0, 1fr)); padding-inline: 0; gap: 14px; }
   .artist-albums-grid { grid-template-columns: repeat(3, 1fr); }
   .artist-results, .tracks-results > button, .user-results > div, .search-list-results > div { margin-inline: 0; }
@@ -688,8 +714,10 @@ textarea::placeholder { color: #58677d; }
 
 @media (min-width: 1024px) {
   :root { --page-gutter: clamp(32px, 4vw, 72px); }
-  .universal-header-row { max-width: 1800px; margin-inline: auto; height: 78px; padding-inline: var(--page-gutter); }
+  .universal-header { position: sticky; top: 0; width: 100%; }
+  .universal-header-row { width: 100%; max-width: none; margin-inline: 0; height: 78px; padding-inline: var(--page-gutter); }
   .app-shell > .album-page,
+  .app-shell > .artist-page,
   .app-shell > .profile-page,
   .app-shell > .search-page,
   .app-shell > .list-viewer {
@@ -698,8 +726,7 @@ textarea::placeholder { color: #58677d; }
     margin: 0 48px 0 264px;
     padding-bottom: 64px;
   }
-  .app-shell > .edit-profile-screen,
-  .app-shell > .settings-screen { width: min(calc(100% - 96px), 1000px); margin: 24px auto; border: 1px solid var(--border); border-radius: 20px; }
+  .app-error { margin-left: 264px; margin-right: 48px; max-width: calc(100% - 312px); }
 
   .bottom-nav {
     top: 78px;
@@ -765,6 +792,8 @@ textarea::placeholder { color: #58677d; }
     column-gap: 28px;
   }
   .search-page > .search-header,
+  .search-page > .active-filters-bar,
+  .search-page > .error-text,
   .search-page > .discovery-filters,
   .search-page > .release-calendar { grid-column: 1 / -1; }
   .search-header { top: 78px; }
@@ -843,9 +872,13 @@ textarea::placeholder { color: #58677d; }
   .bottom-nav { width: 248px; padding-inline: 22px; }
   .app-shell:has(.hero-intro) > main { width: calc(100% - 376px); margin-left: 296px; }
   .app-shell > .album-page,
+  .app-shell > .artist-page,
   .app-shell > .profile-page,
   .app-shell > .search-page,
   .app-shell > .list-viewer { width: calc(100% - 376px); margin-left: 296px; }
+  .app-shell > .edit-profile-screen,
+  .app-shell > .settings-screen { width: min(calc(100% - 344px), 1000px); margin: 24px auto 24px 296px; }
+  .app-error { margin-left: 296px; margin-right: 48px; max-width: calc(100% - 344px); }
   .search-page,
   .list-viewer { width: calc(100% - 376px); margin-left: 296px; }
   .app-shell:has(.hero-intro) > main { grid-template-columns: minmax(0, 1.3fr) minmax(420px, .7fr); }

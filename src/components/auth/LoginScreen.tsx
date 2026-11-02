@@ -97,7 +97,7 @@ export default function LoginScreen({ setScreen }: { setScreen: (s: "home" | "re
           </button>
         </div>
 
-        {error && <p role="alert" className="error-text" style={{ color: "red", fontSize: "0.875rem", marginBottom: "1rem" }}>{error}</p>}
+        {error && <p role="alert" className="error-text">{error}</p>}
 
         <button className="publish-button" disabled={loading}>
           {loading ? "Signing in..." : "Sign In"}

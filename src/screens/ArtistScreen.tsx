@@ -10,6 +10,7 @@ export function ArtistScreen({
   loadMore,
   hasMore,
   openAlbum,
+  loading = false,
 }: {
   artist: string | null;
   albums: Album[];
@@ -17,6 +18,7 @@ export function ArtistScreen({
   loadMore: () => void;
   hasMore: boolean;
   openAlbum: (id?: string) => void;
+  loading?: boolean;
 }) {
   return (
     <main className="artist-page">
@@ -28,23 +30,31 @@ export function ArtistScreen({
           <p>Artist</p>
         </div>
       </section>
-      <SectionTitle>Albums by {artist}</SectionTitle>
-      <div className="artist-albums-grid">
-        {albums.map((album) => (
-          <button key={album.id} className="artist-album-tile" onClick={() => openAlbum(album.id)}>
-            <div className="cover-wrap">
-              <img src={album.coverUrl} alt={`${album.title} by ${album.artist}`} />
-            </div>
-            <strong>{album.title}</strong>
-            <span>{album.year}</span>
-          </button>
-        ))}
-        {albums.length === 0 && <p className="screen-heading">No albums found for this artist.</p>}
-      </div>
-      {hasMore && (
-        <div className="load-more-container">
-          <button className="publish-button" onClick={loadMore}>Load More</button>
+      {loading && albums.length === 0 && (
+        <div className="search-loading" style={{ justifyContent: "center", alignItems: "center", height: "400px" }}>
+          <div className="search-spinner" />
+          <p className="screen-heading">Loading albums…</p>
         </div>
+      )}
+      {(!loading || albums.length > 0) && (
+        <>
+          <SectionTitle>Albums by {artist}</SectionTitle>
+          <div className="search-albums">
+            {albums.map((album) => (
+              <button key={album.id} className="search-album-button" onClick={() => openAlbum(album.id)}>
+                <img src={album.coverUrl} alt={`${album.title} by ${album.artist}`} />
+                <strong>{album.title}</strong>
+                <span>{album.year}</span>
+              </button>
+            ))}
+            {albums.length === 0 && !loading && <p className="empty-state">No albums found for this artist.</p>}
+          </div>
+          {hasMore && (
+            <div className="load-more-container">
+              <button className="publish-button" onClick={loadMore}>Load More</button>
+            </div>
+          )}
+        </>
       )}
     </main>
   );

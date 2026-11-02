@@ -47,7 +47,7 @@ export function AlbumScreen({
     return currentCount > popularCount ? review.favoriteTrackId : popular;
   }, undefined);
   if (!album) {
-    return <main className="album-page"><AppHeader onHome={onHome} action={<span />} /><p className="screen-heading">Album not found in the local music catalog.</p></main>;
+    return <main className="album-page"><AppHeader onHome={onHome} action={<span />} /><p className="empty-state">Album not found in the local music catalog.</p></main>;
   }
   return (
     <main className="album-page">
@@ -63,8 +63,7 @@ export function AlbumScreen({
           <span>
             {album.year}
             {album.trackCount > 0 ? ` · ${album.trackCount} tracks` : ""}
-            {album.duration ? ` · ${album.duration}` : ""}
-            {album.trackCount === 0 && !album.duration ? " · Track details unavailable" : ""}
+            {album.trackCount === 0 ? " · Track details unavailable" : ""}
           </span>
           <div className="pills">{album.genres.map((genre) => <span key={genre}>{genre}</span>)}</div>
           {album.metadataSource && <small className="metadata-attribution">
@@ -101,10 +100,9 @@ export function AlbumScreen({
                 <span>{String(track.trackNumber).padStart(2, "0")}</span>
                 <strong>{track.title}{trackStats && <small className="track-review-count">★ {(trackStats.totalRating / trackStats.count).toFixed(1)} · {trackStats.count} review(s)</small>}</strong>
                 <span aria-label={popularTrackId && track.id === popularTrackId ? "Most popular favorite track" : "Track"}><Icon name="star" size={17} fill={popularTrackId && track.id === popularTrackId ? "currentColor" : "none"} /></span>
-                <time>{track.duration}</time>
               </div>;
             })}
-            {tracks.length === 0 && <p className="screen-heading">Track information is not available yet.</p>}
+            {tracks.length === 0 && <p className="empty-state">Track information is not available yet.</p>}
           </div>
         </section>
 
@@ -119,7 +117,7 @@ export function AlbumScreen({
             {(review.textContent ?? review.content) && <p>{review.textContent ?? review.content}</p>}
             <div className="review-footer"><span>{review.likesCount ?? review.likes ?? 0} likes</span><span>{review.isRewatch ? "Re-listen" : "Listen"}</span></div>
           </article>)}
-          {reviews.length === 0 && <p className="screen-heading">No reviews yet. Be the first to log this album.</p>}
+          {reviews.length === 0 && <p className="empty-state">No reviews yet. Be the first to log this album.</p>}
         </section>
       </div>
     </main>

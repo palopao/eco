@@ -27,7 +27,6 @@ export function SearchScreen({ albums, openAlbum, openArtist }: { albums: Album[
     searchTracks,
     baseAlbums,
     artists,
-    filteredAlbums,
     hasSearched,
     executeSearch,
     loadMore,
@@ -107,16 +106,16 @@ export function SearchScreen({ albums, openAlbum, openArtist }: { albums: Album[
           <section className="result-section">
             <SectionTitle>Albums</SectionTitle>
             <div className="search-albums">
-              {filteredAlbums.map((album) => (
+              {baseAlbums.map((album) => (
                 <button key={album.id} onClick={() => openAlbum(album.id)}>
                   <img src={album.coverUrl} alt="" />
                   <strong>{album.title}</strong>
-                  <span>{album.artist}</span>
+                  <span>{album.year}</span>
                 </button>
               ))}
             </div>
             {searching && <SearchLoading message="Searching albums…" />}
-            {!searching && hasFullSearch && filteredAlbums.length === 0 && <p className="screen-heading">No matching albums found.</p>}
+            {!searching && hasFullSearch && baseAlbums.length === 0 && <p className="empty-state">No matching albums found.</p>}
             {!searching && hasMoreResults && <button className="publish-button" onClick={loadMore}>Load More</button>}
           </section>
         )}
@@ -154,10 +153,10 @@ export function SearchScreen({ albums, openAlbum, openArtist }: { albums: Album[
                   </button>
                 ))}
                 {searching && <SearchLoading message="Searching tracks…" />}
-                {!searching && searchTracks.length === 0 && !searchError && <p className="screen-heading">No matching tracks found.</p>}
+                {!searching && searchTracks.length === 0 && !searchError && <p className="empty-state">No matching tracks found.</p>}
               </div>
             ) : (
-              <p className="screen-heading">
+              <p className="empty-state">
                 {category === "All" ? "Choose Tracks to search song titles." : "Type at least two characters to search tracks."}
               </p>
             )}
@@ -167,14 +166,14 @@ export function SearchScreen({ albums, openAlbum, openArtist }: { albums: Album[
         {(category === "All" || category === "Users") && (
           <section className="result-section user-results">
             <SectionTitle>Users</SectionTitle>
-            <p className="screen-heading">Member search is not available yet.</p>
+            <p className="empty-state">Member search is not available yet.</p>
           </section>
         )}
 
         {(category === "All" || category === "Lists") && (
           <section className="result-section search-list-results">
             <SectionTitle>Lists</SectionTitle>
-            <p className="screen-heading">Explore public lists from the Lists tab.</p>
+            <p className="empty-state">Explore public lists from the Lists tab.</p>
           </section>
         )}
       </main>

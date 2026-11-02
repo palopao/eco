@@ -101,6 +101,8 @@ export default function App() {
   const [selectedArtist, setSelectedArtist] = useState<string | null>(null);
   const [artistAlbums, setArtistAlbums] = useState<Album[]>([]);
   const [artistOffset, setArtistOffset] = useState(0);
+  const [artistHasMore, setArtistHasMore] = useState(false);
+  const [loadingArtist, setLoadingArtist] = useState(false);
   const [albumTracks, setAlbumTracks] = useState<Track[]>([]);
   const [albumReviews, setAlbumReviews] = useState<Review[]>([]);
   const [recentReviews, setRecentReviews] = useState<Review[]>([]);
@@ -185,34 +187,39 @@ export default function App() {
   useEffect(() => {
     const userId = auth?.currentUser?.uid;
     if (screen !== "profile" || !userId) return;
+    let cancelled = false;
     Promise.all([reviewService.getUserReviews(userId), listService.getUserLists(userId)])
       .then(([reviews, lists]) => {
+        if (cancelled) return;
         setUserReviews(reviews);
         setUserLists(lists);
         const listAlbumIds = lists.flatMap((list) => list.albumIds ?? list.albums?.map((item) => item.albumId) ?? []);
         const albumIds = [...reviews.map((review) => review.albumId), ...listAlbumIds];
-        return albumService.getAlbumsByIds(albumIds);
-      })
-      .then((referencedAlbums) => {
-        setAlbums((current) => mergeAlbums(current, referencedAlbums));
+        if (albumIds.length === 0) return;
+        albumService.getAlbumsByIds(albumIds)
+          .then((referencedAlbums) => {
+            if (!cancelled) setAlbums((current) => mergeAlbums(current, referencedAlbums));
+          })
+          .catch((albumError) => {
+            console.error("Could not load profile album metadata.", albumError);
+          });
       })
       .catch((error: unknown) => {
+        if (cancelled) return;
         console.error("Could not load profile activity.", error);
         setLoadError("Your profile activity could not be loaded.");
       });
+    return () => { cancelled = true; };
   }, [screen, currentUser?.id]);
 
   const openAlbum = async (id?: string, fromScreen?: string) => {
     const albumId = id ?? albums[0]?.id;
     if (albumId) {
-      if (fromScreen && fromScreen !== "album") {
-        pushScreen("album", fromScreen);
-      }
+      pushScreen("album", fromScreen);
       setSelectedAlbumId(albumId);
       setAlbumReviews([]);
       setAlbumTracks([]);
       void refreshAlbumReviews(albumId);
-      setScreen("album");
       try {
         const album = await albumService.getAlbumById(albumId);
         if (!album) {
@@ -227,36 +234,42 @@ export default function App() {
       }
       return;
     }
-    setScreen("album");
+    pushScreen("album", fromScreen);
   };
 
   const openArtist = async (artist: string, fromScreen?: string) => {
-    if (fromScreen && fromScreen !== "artist") {
-      pushScreen("artist", fromScreen);
-    }
+    pushScreen("artist", fromScreen);
     setSelectedArtist(artist);
     setArtistAlbums([]);
     setArtistOffset(0);
-    setScreen("artist");
+    setArtistHasMore(false);
+    setLoadingArtist(true);
     try {
       const results = await albumService.getAlbumsByArtist(artist, 50, 0);
       setArtistAlbums(results);
+      setArtistHasMore(results.length >= 50);
       setAlbums((current) => mergeAlbums(current, results));
     } catch (error) {
       console.error("Could not load artist albums.", error);
       setLoadError("Artist albums could not be loaded.");
+    } finally {
+      setLoadingArtist(false);
     }
   };
 
   const loadMoreArtistAlbums = async () => {
     if (!selectedArtist) return;
+    setLoadingArtist(true);
     try {
       const results = await albumService.getAlbumsByArtist(selectedArtist, 50, artistOffset);
       setArtistOffset((prev) => prev + 50);
       setArtistAlbums((current) => mergeAlbums(current, results));
+      setArtistHasMore(results.length >= 50);
       setAlbums((all) => mergeAlbums(all, results));
     } catch (error) {
       console.error("Could not load more artist albums.", error);
+    } finally {
+      setLoadingArtist(false);
     }
   };
 
@@ -311,7 +324,7 @@ export default function App() {
     <div className="app-shell">
       {screen === "home" && <HomeScreen albums={albums} reviews={recentReviews} user={currentUser} openAlbum={openAlbum} openSearch={() => setScreen("search")} />}
       {screen === "album" && <AlbumScreen album={selectedAlbum} tracks={albumTracks} reviews={albumReviews} goBack={goBack} openLog={openLog} onHome={() => setScreen("home")} />}
-      {screen === "artist" && <ArtistScreen artist={selectedArtist} albums={artistAlbums} goBack={goBack} loadMore={loadMoreArtistAlbums} hasMore={artistAlbums.length === 50} openAlbum={openAlbum} />}
+      {screen === "artist" && <ArtistScreen artist={selectedArtist} albums={artistAlbums} goBack={goBack} loadMore={loadMoreArtistAlbums} hasMore={artistHasMore} openAlbum={openAlbum} loading={loadingArtist} />}
       {screen === "profile" && <ProfileScreen user={currentUser} albums={albums} reviews={userReviews} lists={userLists} openShare={openShare} editProfile={() => setScreen("edit-profile")} openSettings={() => setScreen("settings")} onHome={() => setScreen("home")} />}
       {screen === "edit-profile" && <EditProfileScreen close={() => setScreen("profile")} user={currentUser} albums={albums} onSave={saveProfile} />}
       {screen === "settings" && <SettingsScreen close={() => setScreen("profile")} onLogout={handleLogout} />}
@@ -324,7 +337,7 @@ export default function App() {
       {listOpen && <ListCreator close={() => setListOpen(false)} albums={albums} userId={auth?.currentUser?.uid} onCreated={refreshPublicLists} />}
       {shareOpen && <ShareScreen close={() => setShareOpen(false)} album={albums.find((item) => item.id === shareReview?.albumId) ?? selectedAlbum ?? albums[0] ?? null} review={shareReview} user={currentUser} />}
       {albumSelectOpen && <AlbumSelectionModal close={() => setAlbumSelectOpen(false)} onAlbumSelected={(album) => { setSelectedLogAlbum(album); setAlbumSelectOpen(false); setLogOpen(true); }} />}
-      {loadError && <p role="alert" className="error-text">{loadError}</p>}
+      {loadError && <p role="alert" className="error-text app-error">{loadError}</p>}
     </div>
   );
 }

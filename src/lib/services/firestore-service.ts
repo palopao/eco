@@ -62,9 +62,10 @@ export const albumService = {
     searchText: string,
     filters?: { decade?: string; year?: string; genre?: string },
     offsetCount = 0,
+    searchField?: string,
     signal?: AbortSignal
   ): Promise<Album[]> {
-    return catalogService.searchAlbums(searchText, 30, offsetCount, filters, signal);
+    return catalogService.searchAlbums(searchText, 30, offsetCount, filters, searchField, signal);
   },
 
   async getAlbumsByArtist(artist: string, limitCount = 50, offsetCount = 0, signal?: AbortSignal): Promise<Album[]> {
@@ -80,21 +81,22 @@ export const reviewService = {
   async getReviewsByAlbum(albumId: string): Promise<Review[]> {
     const db = requireDb();
     const reviews = collection(db, REVIEWS_COL);
-    const [current, legacy] = await Promise.all([
-      getDocs(query(reviews, where("albumId", "==", albumId), orderBy("listenedAt", "desc"), limit(100))),
-      getDocs(query(reviews, where("albumId", "==", albumId), orderBy("timestamp", "desc"), limit(100))),
-    ]);
-    return mergeReviews(current.docs.map(mapReview), legacy.docs.map(mapReview)).slice(0, 100);
+    const snapshot = await getDocs(query(reviews, where("albumId", "==", albumId), limit(100)));
+    return snapshot.docs.map(mapReview);
   },
 
   async getUserReviews(userId: string): Promise<Review[]> {
     const db = requireDb();
     const reviews = collection(db, REVIEWS_COL);
-    const [current, legacy] = await Promise.all([
-      getDocs(query(reviews, where("userId", "==", userId), orderBy("listenedAt", "desc"), limit(100))),
-      getDocs(query(reviews, where("userId", "==", userId), orderBy("timestamp", "desc"), limit(100))),
-    ]);
-    return mergeReviews(current.docs.map(mapReview), legacy.docs.map(mapReview)).slice(0, 100);
+    const snapshot = await getDocs(query(reviews, where("userId", "==", userId), limit(100)));
+    const mapped = snapshot.docs.map(mapReview);
+    return mapped.sort((left, right) => {
+      const leftDate = left.listenedAt ?? left.timestamp;
+      const rightDate = right.listenedAt ?? right.timestamp;
+      const leftMillis = leftDate instanceof Date ? leftDate.getTime() : leftDate?.toMillis?.() ?? 0;
+      const rightMillis = rightDate instanceof Date ? rightDate.getTime() : rightDate?.toMillis?.() ?? 0;
+      return rightMillis - leftMillis;
+    });
   },
 
   async getRecentReviews(limitCount = 20): Promise<Review[]> {

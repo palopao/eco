@@ -48,7 +48,7 @@ export function createCatalogServer() {
             decade: query.decade || undefined,
             year: query.year || undefined,
             genre: query.genre || undefined,
-          }));
+          }, query.field || undefined));
         }
         if (pathname === "/api/catalog/albums-by-artist" || pathname === "/albums-by-artist") {
           const artist = query.artist ?? "";

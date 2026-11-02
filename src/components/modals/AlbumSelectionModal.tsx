@@ -32,7 +32,7 @@ export function AlbumSelectionModal({
     const requestId = ++latest.current;
     setLoading(true);
     albumService
-      .searchAlbums(query, undefined, 0, abortController.current!.signal)
+      .searchAlbums(query, undefined, 0, undefined, abortController.current!.signal)
       .then((results) => {
         if (requestId === latest.current && !abortController.current!.signal.aborted) {
           setSuggestions(results);
@@ -87,7 +87,7 @@ export function AlbumSelectionModal({
               <span style={{ color: "var(--text-3)" }}><Icon name="chevron" size={16} /></span>
             </div>
           ))}
-          {suggestions.length === 0 && query.trim() && <p className="screen-heading">No albums found matching your search.</p>}
+          {suggestions.length === 0 && query.trim() && <p className="empty-state">No albums found matching your search.</p>}
         </div>
       </form>
     </div>

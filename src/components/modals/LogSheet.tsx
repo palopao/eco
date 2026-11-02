@@ -79,7 +79,7 @@ export function LogSheet({
             <button type="button" className="choose-album-btn" onClick={() => setAlbumSelectOpen(true)}><Icon name="plus" size={18} /> Choose album</button>
           )}
         </div>
-        {!selectedAlbumForLog && !album && <p className="screen-heading" style={{ textAlign: "center", margin: "20px 0" }}>Tap "Choose album" to search and select an album to review.</p>}
+        {!selectedAlbumForLog && !album && <p className="empty-state" style={{ textAlign: "center", margin: "20px 0" }}>Tap "Choose album" to search and select an album to review.</p>}
         {selectedAlbumForLog || album ? (
           <>
             <div className="rating-block">

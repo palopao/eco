@@ -23,6 +23,7 @@ export function EditProfileScreen({
   const [photoURL, setPhotoURL] = useState(user?.photoURL ?? user?.avatarUrl ?? "");
   const [lastfmUsername, setLastfmUsername] = useState(user?.lastfmUsername ?? "");
   const [favoriteAlbums, setFavoriteAlbums] = useState(user?.favoriteAlbums ?? []);
+  const [favoriteSearch, setFavoriteSearch] = useState("");
   const [saving, setSaving] = useState(false);
   const [imageLoading, setImageLoading] = useState(false);
   const [error, setError] = useState("");
@@ -62,10 +63,24 @@ export function EditProfileScreen({
     }
   };
 
-  const changeFavorites = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selected = Array.from(event.currentTarget.selectedOptions, (option) => option.value);
-    if (selected.length <= 4) setFavoriteAlbums(selected);
+  const toggleFavorite = (albumId: string) => {
+    setFavoriteAlbums((current) =>
+      current.includes(albumId)
+        ? current.filter((id) => id !== albumId)
+        : current.length < 4
+          ? [...current, albumId]
+          : current,
+    );
   };
+
+  const isFavorite = (albumId: string) => favoriteAlbums.includes(albumId);
+
+  const searchResults = favoriteSearch.trim()
+    ? albums.filter(
+        (album) =>
+          `${album.title} ${album.artist}`.toLowerCase().includes(favoriteSearch.trim().toLowerCase()),
+      )
+    : [];
 
   return <main className="account-screen edit-profile-screen">
     <form onSubmit={saveProfile}>
@@ -80,9 +95,45 @@ export function EditProfileScreen({
       </section>
       <section className="favorite-editor">
         <div className="edit-section-title"><div><span>SHOWCASE</span><h2>Top 4 Favorite Albums</h2></div><p>Select up to four</p></div>
-        <select className="text-field" multiple value={favoriteAlbums} onChange={changeFavorites} aria-label="Choose up to four favorite albums">
-          {albums.map((album) => <option key={album.id} value={album.id}>{album.title} — {album.artist}</option>)}
-        </select>
+        <div className="add-search">
+          <Icon name="search" size={18} />
+          <input
+            id="favorite-album-search"
+            placeholder="Search for an album…"
+            value={favoriteSearch}
+            onChange={(event) => setFavoriteSearch(event.target.value)}
+          />
+        </div>
+        <div className="added-albums">
+          {searchResults.filter((album): album is Album & { id: string } => Boolean(album.id)).map((album) => (
+            <div key={album.id} className={`favorite-album-item ${isFavorite(album.id) ? "selected" : ""}`} onClick={() => toggleFavorite(album.id)}>
+              <img src={album.coverUrl} alt="" />
+              <div>
+                <strong>{album.title}</strong>
+                <small>{album.artist}</small>
+              </div>
+              {isFavorite(album.id) ? <span style={{ color: "var(--cyan)" }}><Icon name="star" size={16} /></span> : null}
+            </div>
+          ))}
+          {favoriteSearch.trim() && searchResults.length === 0 && <p className="empty-state">No albums found matching your search.</p>}
+          {!favoriteSearch.trim() && <p className="empty-state" style={{ textAlign: "center", color: "var(--text-3)", fontSize: "12px", marginTop: "16px" }}>Search for an album to add it to your favorites.</p>}
+        </div>
+        <div className="selected-favorites">
+          <strong>Selected ({favoriteAlbums.length}/4):</strong>
+          <div className="selected-favorites-grid">
+            {favoriteAlbums.map((id) => {
+              const album = albums.find((a) => a.id === id);
+              if (!album) return null;
+              return (
+                <div key={id} className="selected-favorite-chip" onClick={() => toggleFavorite(id)}>
+                  <img src={album.coverUrl} alt="" />
+                  <span>{album.title}</span>
+                  <Icon name="close" size={14} />
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </section>
       <section className="edit-form">
         <label htmlFor="display-name">Display Name</label><input id="display-name" className="text-field" value={displayName} onChange={(event) => setDisplayName(event.target.value)} required maxLength={80} />

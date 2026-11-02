@@ -141,7 +141,8 @@ export function searchAlbums(
   query: string,
   limitCount = 30,
   offsetCount = 0,
-  filters?: { decade?: string; year?: string; genre?: string }
+  filters?: { decade?: string; year?: string; genre?: string },
+  searchField?: string
 ): any[] {
   const q = query.toLowerCase();
   const results: any[] = [];
@@ -154,8 +155,16 @@ export function searchAlbums(
       let sql = `SELECT * FROM albums WHERE 1=1`;
       const params: any[] = [];
       if (q) {
-        sql += ` AND (LOWER(title) LIKE ? OR LOWER(artist) LIKE ? OR LOWER(genres) LIKE ?)`;
-        params.push(`%${q}%`, `%${q}%`, `%${q}%`);
+        if (searchField === "title") {
+          sql += ` AND LOWER(title) LIKE ?`;
+          params.push(`%${q}%`);
+        } else if (searchField === "artist") {
+          sql += ` AND LOWER(artist) LIKE ?`;
+          params.push(`%${q}%`);
+        } else {
+          sql += ` AND (LOWER(title) LIKE ? OR LOWER(artist) LIKE ? OR LOWER(genres) LIKE ?)`;
+          params.push(`%${q}%`, `%${q}%`, `%${q}%`);
+        }
       }
       if (filters?.year) {
         sql += ` AND releaseDate LIKE ?`;
@@ -185,21 +194,31 @@ export function searchAlbums(
     const dateCompare = (b.releaseDate ?? "").localeCompare(a.releaseDate ?? "");
     if (dateCompare !== 0) return dateCompare;
     // Secondary: relevance score within the same date
-    const aScore = relevanceScore(a, q);
-    const bScore = relevanceScore(b, q);
+    const aScore = relevanceScore(a, q, searchField);
+    const bScore = relevanceScore(b, q, searchField);
     return bScore - aScore;
   });
   return ranked.slice(offsetCount, offsetCount + limitCount);
 }
 
-function relevanceScore(album: any, q: string): number {
+function relevanceScore(album: any, q: string, searchField?: string): number {
   if (!q) return 0;
   const title = (album.title || "").toLowerCase();
   const artist = (album.artist || "").toLowerCase();
   let score = 0;
-  if (title === q || artist === q) score += 100;
-  else if (title.startsWith(q) || artist.startsWith(q)) score += 50;
-  else if (title.includes(q) || artist.includes(q)) score += 10;
+  if (searchField === "title") {
+    if (title === q) score += 100;
+    else if (title.startsWith(q)) score += 50;
+    else if (title.includes(q)) score += 10;
+  } else if (searchField === "artist") {
+    if (artist === q) score += 100;
+    else if (artist.startsWith(q)) score += 50;
+    else if (artist.includes(q)) score += 10;
+  } else {
+    if (title === q || artist === q) score += 100;
+    else if (title.startsWith(q) || artist.startsWith(q)) score += 50;
+    else if (title.includes(q) || artist.includes(q)) score += 10;
+  }
   return score;
 }
 

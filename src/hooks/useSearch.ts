@@ -23,6 +23,7 @@ export function useSearch({ initialAlbums }: { initialAlbums: Album[] }) {
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
+  const [hasMoreResults, setHasMoreResults] = useState(false);
 
   const latestSearch = useRef(0);
   const abortController = useRef<AbortController | null>(null);
@@ -48,13 +49,23 @@ export function useSearch({ initialAlbums }: { initialAlbums: Album[] }) {
       setSearchTracks([]);
       setSearching(false);
       setSearchError("");
+      setHasMoreResults(false);
       return;
     }
 
     const requestId = ++latestSearch.current;
+    const searchField =
+      category === "Albums" ? "title" : category === "Artists" ? "artist" : undefined;
+
+    // Reset results for the new category (independent searches)
+    if (searchOffset === 0) {
+      setSearchAlbums([]);
+      setSearchTracks([]);
+    }
 
     const timer = window.setTimeout(async () => {
       setSearching(true);
+      setHasMoreResults(false);
       setSearchError("");
       try {
         if (category === "Tracks") {
@@ -71,11 +82,13 @@ export function useSearch({ initialAlbums }: { initialAlbums: Album[] }) {
               genre: filters.genres[0] || undefined,
             },
             searchOffset,
+            searchField,
             abortController.current!.signal
           );
           if (requestId === latestSearch.current && !abortController.current!.signal.aborted) {
             if (searchOffset === 0) setSearchAlbums(results);
             else setSearchAlbums((prev) => mergeAlbums(prev, results));
+            setHasMoreResults(results.length >= 30);
           }
         }
       } catch (error: unknown) {
@@ -156,13 +169,12 @@ export function useSearch({ initialAlbums }: { initialAlbums: Album[] }) {
     setSearching(false);
     setSearchError("");
     setHasSearched(false);
+    setHasMoreResults(false);
   };
 
   const loadMore = () => {
     setSearchOffset((prev) => prev + 30);
   };
-
-  const hasMoreResults = searching ? false : searchAlbums.length > 0 && searchAlbums.length % 30 === 0;
 
   return {
     category,
