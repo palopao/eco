@@ -13,8 +13,6 @@
   "dependencies": {
     "better-sqlite3": "^13.0.3",
     "firebase": "^12.19.0",
-    "framer-motion": "^13.4.6",
-    "lucide-react": "^1.49.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

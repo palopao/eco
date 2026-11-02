@@ -192,7 +192,7 @@ export function useSearch({ initialAlbums }: { initialAlbums: Album[] }) {
   };
 }
 
-function mergeAlbums(current: Album[], incoming: Album[]): Album[] {
+export function mergeAlbums(current: Album[], incoming: Album[]): Album[] {
   const byId = new Map(current.map((album) => [album.id, album]));
   for (const album of incoming) {
     if (album.id) byId.set(album.id, album);

@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef, type ReactNode } from "react";
 import { albumService, listService, reviewService, userService } from "./lib/services/firestore-service";
-import { Album, Review, Track, TrackSearchResult, User, UserList } from "./types";
+import { Album, Review, Track, User, UserList } from "./types";
 import { auth, firebaseConfigured } from "./lib/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import LoginScreen from "./components/auth/LoginScreen";
 import RegisterScreen from "./components/auth/RegisterScreen";
 import { useNavigation } from "./hooks/useNavigation";
+import { mergeAlbums } from "./hooks/useSearch";
 import { HomeScreen } from "./screens/HomeScreen";
 import { SearchScreen } from "./screens/SearchScreen";
 import { ArtistScreen } from "./screens/ArtistScreen";
@@ -21,14 +22,6 @@ import { AlbumSelectionModal } from "./components/modals/AlbumSelectionModal";
 
 type Screen = "home" | "album" | "artist" | "search" | "lists" | "profile" | "edit-profile" | "settings" | "login" | "register";
 
-function mergeAlbums(current: Album[], incoming: Album[]): Album[] {
-  const byId = new Map(current.map((album) => [album.id, album]));
-  for (const album of incoming) {
-    if (album.id) byId.set(album.id, album);
-  }
-  return [...byId.values()];
-}
-
 const art = [
   "https://images.unsplash.com/photo-1597773150796-e5c14ebecbf5?auto=format&fit=crop&w=700&q=85",
   "https://images.unsplash.com/photo-1557264322-b44d383a2906?auto=format&fit=crop&w=700&q=85",
@@ -38,9 +31,6 @@ const art = [
   "https://images.unsplash.com/photo-1563305096-9af2877f57f9?auto=format&fit=crop&w=700&q=85",
   "https://images.unsplash.com/photo-1582721691120-d1db3852893e?auto=format&fit=crop&w=700&q=85",
 ];
-
-const portrait =
-  "https://images.unsplash.com/photo-1776849443030-186b43bff95c?auto=format&fit=crop&w=300&q=85";
 
 function BottomNav({ active, setScreen, openLog }: { active: Screen; setScreen: (s: Screen) => void; openLog: () => void }) {
   return (
@@ -95,7 +85,7 @@ function Icon({
 }
 
 export default function App() {
-  const { screen, setScreen, pushScreen, goBack, navHistory } = useNavigation();
+  const { screen, setScreen, pushScreen, goBack } = useNavigation();
   const [logOpen, setLogOpen] = useState(false);
   const [listOpen, setListOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
@@ -320,13 +310,13 @@ export default function App() {
   return (
     <div className="app-shell">
       {screen === "home" && <HomeScreen albums={albums} reviews={recentReviews} user={currentUser} openAlbum={openAlbum} openSearch={() => setScreen("search")} />}
-      {screen === "album" && <AlbumScreen album={selectedAlbum} tracks={albumTracks} reviews={albumReviews} goBack={goBack} openLog={openLog} />}
+      {screen === "album" && <AlbumScreen album={selectedAlbum} tracks={albumTracks} reviews={albumReviews} goBack={goBack} openLog={openLog} onHome={() => setScreen("home")} />}
       {screen === "artist" && <ArtistScreen artist={selectedArtist} albums={artistAlbums} goBack={goBack} loadMore={loadMoreArtistAlbums} hasMore={artistAlbums.length === 50} openAlbum={openAlbum} />}
-      {screen === "profile" && <ProfileScreen user={currentUser} albums={albums} reviews={userReviews} lists={userLists} openShare={openShare} editProfile={() => setScreen("edit-profile")} openSettings={() => setScreen("settings")} />}
+      {screen === "profile" && <ProfileScreen user={currentUser} albums={albums} reviews={userReviews} lists={userLists} openShare={openShare} editProfile={() => setScreen("edit-profile")} openSettings={() => setScreen("settings")} onHome={() => setScreen("home")} />}
       {screen === "edit-profile" && <EditProfileScreen close={() => setScreen("profile")} user={currentUser} albums={albums} onSave={saveProfile} />}
       {screen === "settings" && <SettingsScreen close={() => setScreen("profile")} onLogout={handleLogout} />}
       {screen === "search" && <SearchScreen albums={albums} openAlbum={openAlbum} openArtist={openArtist} />}
-      {screen === "lists" && <ListsScreen lists={publicLists} albums={albums} createList={() => setListOpen(true)} openShare={() => openShare()} />}
+      {screen === "lists" && <ListsScreen lists={publicLists} albums={albums} createList={() => setListOpen(true)} openShare={() => openShare()} onHome={() => setScreen("home")} />}
       {screen === "login" && <LoginScreen setScreen={setScreen} />}
       {screen === "register" && <RegisterScreen setScreen={setScreen} />}
       {showNav && <BottomNav active={screen} setScreen={setScreen} openLog={openLog} />}

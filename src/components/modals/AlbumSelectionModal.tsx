@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Album } from "../../types";
 import { albumService } from "../../lib/services/firestore-service";
-import { UniversalHeader } from "../../components/ui/UniversalHeader";
+import { AppHeader } from "../../components/ui/AppHeader";
 import { Icon } from "../../components/ui/Icon";
 import { SectionTitle } from "../../components/ui/SectionTitle";
 
@@ -57,7 +57,7 @@ export function AlbumSelectionModal({
   return (
     <div className="modal-backdrop" onMouseDown={close}>
       <form className="log-sheet" onSubmit={(e) => e.preventDefault()} onMouseDown={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="select-album-title">
-        <UniversalHeader className="modal-safe-header" action={<button type="button" className="header-icon-button" onClick={close} aria-label="Close album selection"><Icon name="close" size={20} /></button>} />
+        <AppHeader className="modal-safe-header" onLogo={close} action={<button type="button" className="header-icon-button" onClick={close} aria-label="Close album selection"><Icon name="close" size={20} /></button>} />
         <div className="sheet-title">
           <div><span>SELECT ALBUM</span><h2 id="select-album-title">Choose an album to review</h2></div>
         </div>

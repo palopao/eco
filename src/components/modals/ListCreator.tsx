@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { listService } from "../../lib/services/firestore-service";
 import type { Album, UserList } from "../../types";
-import { UniversalHeader } from "../../components/ui/UniversalHeader";
+import { AppHeader } from "../../components/ui/AppHeader";
 import { Icon } from "../../components/ui/Icon";
 
 export function ListCreator({
@@ -62,7 +62,7 @@ export function ListCreator({
   );
 
   return <div className="modal-backdrop" onMouseDown={close}><form className="list-creator" onSubmit={saveList} onMouseDown={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
-    <UniversalHeader className="modal-safe-header" action={<button type="button" className="header-icon-button" onClick={close} aria-label="Close list creator"><Icon name="close" size={19} /></button>} />
+    <AppHeader className="modal-safe-header" onLogo={close} action={<button type="button" className="header-icon-button" onClick={close} aria-label="Close list creator"><Icon name="close" size={19} /></button>} />
     <div className="filter-title"><div><span>NEW COLLECTION</span><h2>Create a list</h2></div></div>
     <label className="field-label" htmlFor="list-title">List title</label><input id="list-title" className="text-field" value={title} onChange={(event) => setTitle(event.target.value)} required maxLength={80} />
     <label className="field-label" htmlFor="list-description">Description</label><textarea id="list-description" rows={2} placeholder="What connects these records?" value={description} onChange={(event) => setDescription(event.target.value)} maxLength={500} />

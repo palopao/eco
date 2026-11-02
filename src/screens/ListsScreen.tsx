@@ -2,8 +2,8 @@ import type { Album, UserList } from "../types";
 import { AppHeader } from "../components/ui/AppHeader";
 import { Icon } from "../components/ui/Icon";
 
-export function ListsScreen({ lists, albums, createList, openShare }: { lists: UserList[]; albums: Album[]; createList: () => void; openShare: () => void }) {
-  return <>    <AppHeader onHome={() => {}} title="Lists" action={<button className="header-icon-button" onClick={createList} aria-label="Create list"><Icon name="plus" /></button>} /><main className="list-viewer">
+export function ListsScreen({ lists, albums, createList, openShare, onHome }: { lists: UserList[]; albums: Album[]; createList: () => void; openShare: () => void; onHome: () => void }) {
+  return <>    <AppHeader onHome={onHome} title="Lists" action={<button className="header-icon-button" onClick={createList} aria-label="Create list"><Icon name="plus" /></button>} /><main className="list-viewer">
     {lists.map((list) => {
       const sortedAlbums = (list.albums ?? []).slice().sort((a: { position: number }, b: { position: number }) => a.position - b.position);
       const ids = list.albumIds ?? sortedAlbums.map((item: { albumId: string }) => item.albumId) ?? [];

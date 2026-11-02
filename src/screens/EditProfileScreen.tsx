@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { encodeProfileImage } from "../lib/profile-image";
-import { UniversalHeader } from "../components/ui/UniversalHeader";
+import { AppHeader } from "../components/ui/AppHeader";
 import { Icon } from "../components/ui/Icon";
 import type { User } from "../types";
 import type { Album } from "../types";
+import { PORTRAIT } from "../lib/constants";
 
 export function EditProfileScreen({
   close,
@@ -66,15 +67,12 @@ export function EditProfileScreen({
     if (selected.length <= 4) setFavoriteAlbums(selected);
   };
 
-  const portrait =
-    "https://images.unsplash.com/photo-1776849443030-186b43bff95c?auto=format&fit=crop&w=300&q=85";
-
   return <main className="account-screen edit-profile-screen">
     <form onSubmit={saveProfile}>
-      <UniversalHeader onLogo={close} action={<button className="save-button" disabled={saving}>{saving ? "Saving..." : "Save"}</button>} />
+      <AppHeader onLogo={close} action={<button className="save-button" disabled={saving}>{saving ? "Saving..." : "Save"}</button>} />
       <div className="screen-heading"><span>YOUR ACCOUNT</span><h1>Edit Profile</h1></div>
       <section className="photo-editor">
-        <div><img src={photoURL || portrait} alt="Profile photo preview" className="profile-photo-preview" /></div>
+        <div><img src={photoURL || PORTRAIT} alt="Profile photo preview" className="profile-photo-preview" /></div>
         <label className="field-label" htmlFor="profile-photo">Upload photo or provide an image URL</label>
         <input id="profile-photo" type="file" accept="image/*" onChange={(event) => void handlePhotoChange(event.currentTarget.files?.[0])} />
         <input className="text-field" type="url" aria-label="Or enter photo URL" placeholder="https://..." value={photoURL.startsWith("data:") ? "" : photoURL} onChange={(event) => setPhotoURL(event.target.value)} />

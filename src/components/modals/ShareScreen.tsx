@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { encodeProfileImage } from "../../lib/profile-image";
-import { UniversalHeader } from "../../components/ui/UniversalHeader";
+import { AppHeader } from "../../components/ui/AppHeader";
 import { Icon } from "../../components/ui/Icon";
 import ProfileAvatar from "../../components/ProfileAvatar";
 import type { Review, User } from "../../types";
 import type { Album } from "../../types";
+import { PORTRAIT, ALBUM_PLACEHOLDER } from "../../lib/constants";
 
 export function ShareScreen({
   close,
@@ -19,13 +19,11 @@ export function ShareScreen({
 }) {
   const [error, setError] = useState("");
   const [working, setWorking] = useState(false);
-  const coverUrl = album?.coverUrl ?? "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=400&q=80";
+  const coverUrl = album?.coverUrl ?? ALBUM_PLACEHOLDER;
   const title = album?.title ?? "Your latest listen";
   const artist = album?.artist ?? "Eco";
   const rating = review?.rating ?? album?.averageRating ?? 0;
   const reviewText = review?.textContent ?? review?.content ?? "";
-  const portrait =
-    "https://images.unsplash.com/photo-1776849443030-186b43bff95c?auto=format&fit=crop&w=300&q=85";
 
   const createImage = async () => {
     const image = new Image();
@@ -143,12 +141,12 @@ export function ShareScreen({
   };
 
   return <div className="modal-backdrop share-backdrop" onMouseDown={close}><section className="share-generator" onMouseDown={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
-    <UniversalHeader className="modal-safe-header" action={<button type="button" className="header-icon-button" onClick={close} aria-label="Close social share card"><Icon name="close" size={19} /></button>} />
+    <AppHeader className="modal-safe-header" onLogo={close} action={<button type="button" className="header-icon-button" onClick={close} aria-label="Close social share card"><Icon name="close" size={19} /></button>} />
     <div className="share-top"><div><span>SOCIAL CARD</span><h2>Share your listen</h2></div></div>
     <div className="story-card">
       <div className="story-bg" style={{ backgroundImage: `url(${coverUrl})` }} />
       <div className="story-brand">ec<span>o</span></div>
-      <div className="story-content"><img src={coverUrl} alt={`${title} by ${artist}`} /><div className="story-rating"><span>{"★".repeat(Math.round(rating))}</span><b>{rating.toFixed(1)} / 5.0</b></div><h3>{title}</h3><p className="story-artist">{artist.toUpperCase()}</p>{reviewText && <blockquote>{reviewText}</blockquote>}<div className="story-user"><ProfileAvatar className="share-avatar" src={user?.photoURL || user?.avatarUrl || portrait} alt="" /><span><b>@{user?.username ?? "listener"}</b><small>Logged on Eco</small></span></div></div>
+      <div className="story-content"><img src={coverUrl} alt={`${title} by ${artist}`} /><div className="story-rating"><span>{"★".repeat(Math.round(rating))}</span><b>{rating.toFixed(1)} / 5.0</b></div><h3>{title}</h3><p className="story-artist">{artist.toUpperCase()}</p>{reviewText && <blockquote>{reviewText}</blockquote>}        <div className="story-user"><ProfileAvatar className="share-avatar" src={user?.photoURL || user?.avatarUrl || PORTRAIT} alt="" /><span><b>@{user?.username ?? "listener"}</b><small>Logged on Eco</small></span></div></div>
     </div>
     {error && <p role="alert" className="error-text">{error}</p>}
     <div className="share-actions"><button className="publish-button" disabled={working} onClick={shareCard}><Icon name="share" size={18} /> Share card</button><button className="square-action" disabled={working} onClick={downloadCard} aria-label="Download image"><Icon name="download" /></button></div>

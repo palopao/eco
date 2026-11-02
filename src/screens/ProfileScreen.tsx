@@ -4,9 +4,7 @@ import { AppHeader } from "../components/ui/AppHeader";
 import { Icon } from "../components/ui/Icon";
 import { Stars } from "../components/ui/Stars";
 import ProfileAvatar from "../components/ProfileAvatar";
-
-const portrait =
-  "https://images.unsplash.com/photo-1776849443030-186b43bff95c?auto=format&fit=crop&w=300&q=85";
+import { PORTRAIT } from "../lib/constants";
 
 export function ProfileScreen({
   user,
@@ -16,6 +14,7 @@ export function ProfileScreen({
   openShare,
   editProfile,
   openSettings,
+  onHome,
 }: {
   user: User | null;
   albums: Album[];
@@ -24,9 +23,10 @@ export function ProfileScreen({
   openShare: (review?: Review) => void;
   editProfile: () => void;
   openSettings: () => void;
+  onHome: () => void;
 }) {
   const [tab, setTab] = useState<"reviews" | "lists" | "stats">("reviews");
-  const avatarUrl = user?.photoURL ?? user?.avatarUrl ?? portrait;
+  const avatarUrl = user?.photoURL ?? user?.avatarUrl ?? PORTRAIT;
   const favoriteAlbums = (user?.favoriteAlbums ?? [])
     .map((albumId: string) => albums.find((album) => album.id === albumId))
     .filter((album): album is Album => Boolean(album));

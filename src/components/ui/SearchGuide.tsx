@@ -1,8 +1,11 @@
+import { AppHeader } from "./AppHeader";
+import { Icon } from "./Icon";
+
 export function SearchGuide({ onClose }: { onClose: () => void }) {
   return (
     <div className="modal-backdrop" onMouseDown={onClose}>
       <section className="filter-sheet" onMouseDown={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
-        <UniversalHeader className="modal-safe-header" action={<button type="button" className="header-icon-button" onClick={onClose} aria-label="Close search guide"><Icon name="close" size={19} /></button>} />
+        <AppHeader className="modal-safe-header" onLogo={onClose} action={<button type="button" className="header-icon-button" onClick={onClose} aria-label="Close search guide"><Icon name="close" size={19} /></button>} />
         <div className="filter-title"><div><span>SEARCH GUIDE</span><h2>How to search</h2></div></div>
         <div className="guide-section">
           <h3>Search by title</h3>
@@ -28,6 +31,3 @@ export function SearchGuide({ onClose }: { onClose: () => void }) {
     </div>
   );
 }
-
-import { UniversalHeader } from "./UniversalHeader";
-import { Icon } from "./Icon";

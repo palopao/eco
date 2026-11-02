@@ -11,12 +11,14 @@ export function AlbumScreen({
   reviews,
   goBack,
   openLog,
+  onHome,
 }: {
   album: Album | null;
   tracks: Track[];
   reviews: Review[];
   goBack: () => void;
   openLog: () => void;
+  onHome: () => void;
 }) {
   const [reviewOrder, setReviewOrder] = useState<"popular" | "recent">("popular");
   const sortedReviews = reviewOrder === "popular"
@@ -45,11 +47,11 @@ export function AlbumScreen({
     return currentCount > popularCount ? review.favoriteTrackId : popular;
   }, undefined);
   if (!album) {
-    return <main className="album-page"><AppHeader onHome={goBack} action={<span />} /><p className="screen-heading">Album not found in the local music catalog.</p></main>;
+    return <main className="album-page"><AppHeader onHome={onHome} action={<span />} /><p className="screen-heading">Album not found in the local music catalog.</p></main>;
   }
   return (
     <main className="album-page">
-      <AppHeader onBack={goBack} title={album.title} action={<button className="header-icon-button" aria-label="Share album"><Icon name="share" /></button>} />
+      <AppHeader onBack={goBack} onHome={onHome} title={album.title} action={<button className="header-icon-button" aria-label="Share album"><Icon name="share" /></button>} />
       <div className="album-hero">
         <div className="hero-blur" style={{ backgroundImage: `url(${album.coverUrl})` }} />
         <img className="hero-cover" src={album.coverUrl} alt={`${album.title} by ${album.artist}`} />

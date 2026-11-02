@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { reviewService } from "../../lib/services/firestore-service";
 import { AlbumSelectionModal } from "./AlbumSelectionModal";
-import { UniversalHeader } from "../../components/ui/UniversalHeader";
+import { AppHeader } from "../../components/ui/AppHeader";
 import { Icon } from "../../components/ui/Icon";
 import type { Album, Review, Track } from "../../types";
+import { ALBUM_PLACEHOLDER } from "../../lib/constants";
 
 export function LogSheet({
   close,
@@ -71,9 +72,9 @@ export function LogSheet({
         <AlbumSelectionModal close={() => setAlbumSelectOpen(false)} onAlbumSelected={handleAlbumSelected} />
       ) : null}
       <form className="log-sheet" onSubmit={publishReview} onMouseDown={(e) => e.stopPropagation()} aria-modal="true" role="dialog" aria-labelledby="log-title">
-        <UniversalHeader className="modal-safe-header" action={<button type="button" className="header-icon-button" onClick={close} aria-label="Close log and review"><Icon name="close" size={20} /></button>} />
+        <AppHeader className="modal-safe-header" onLogo={close} action={<button type="button" className="header-icon-button" onClick={close} aria-label="Close log and review"><Icon name="close" size={20} /></button>} />
         <div className="sheet-title">
-          <div><img src={selectedAlbumForLog?.coverUrl ?? album?.coverUrl ?? "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=400&q=80"} alt="" /><div><span>LOG ALBUM</span><h2 id="log-title">{selectedAlbumForLog?.title ?? album?.title ?? "Select an album"}</h2><p>{selectedAlbumForLog?.artist ?? album?.artist ?? ""}</p></div></div>
+          <div><img src={selectedAlbumForLog?.coverUrl ?? album?.coverUrl ?? ALBUM_PLACEHOLDER} alt="" /><div><span>LOG ALBUM</span><h2 id="log-title">{selectedAlbumForLog?.title ?? album?.title ?? "Select an album"}</h2><p>{selectedAlbumForLog?.artist ?? album?.artist ?? ""}</p></div></div>
           {(!selectedAlbumForLog && !album) && (
             <button type="button" className="choose-album-btn" onClick={() => setAlbumSelectOpen(true)}><Icon name="plus" size={18} /> Choose album</button>
           )}

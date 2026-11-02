@@ -1,9 +1,9 @@
-import { UniversalHeader } from "../components/ui/UniversalHeader";
+import { AppHeader } from "../components/ui/AppHeader";
 import { Icon } from "../components/ui/Icon";
 
 export function SettingsScreen({ close, onLogout }: { close: () => void; onLogout: () => void }) {
   return <main className="account-screen settings-screen">
-    <UniversalHeader onLogo={close} action={<button className="header-text-action" onClick={close}>Done</button>} />
+    <AppHeader onLogo={close} title="Settings" action={<button className="header-text-action" onClick={close}>Done</button>} />
     <div className="screen-heading"><span>YOUR ECO</span><h1>Settings</h1></div>
     <section className="settings-group"><h2>Account & Sync</h2><div className="settings-card">
       <div className="setting-row"><span><strong>Spotify Live Sync</strong><small>Not connected — backend integration required</small></span></div>

@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { FirebaseError } from "firebase/app";
 import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import { Eye, EyeOff } from "lucide-react";
 import { requireAuth } from "../../lib/firebase";
 import { userService } from "../../lib/services/firestore-service";
+import { Icon } from "../ui/Icon";
 
 export default function LoginScreen({ setScreen }: { setScreen: (s: "home" | "register") => void }) {
   const [email, setEmail] = useState("");
@@ -93,7 +93,7 @@ export default function LoginScreen({ setScreen }: { setScreen: (s: "home" | "re
             placeholder="••••••••"
           />
           <button type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? "Hide password" : "Show password"}>
-            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            {showPassword ? <Icon name="eye-off" size={18} /> : <Icon name="eye" size={18} />}
           </button>
         </div>
 

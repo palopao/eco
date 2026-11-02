@@ -27,6 +27,7 @@ export function SearchScreen({ albums, openAlbum, openArtist }: { albums: Album[
     searchTracks,
     baseAlbums,
     artists,
+    filteredAlbums,
     hasSearched,
     executeSearch,
     loadMore,
@@ -36,24 +37,6 @@ export function SearchScreen({ albums, openAlbum, openArtist }: { albums: Album[
   const [filterOpen, setFilterOpen] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
   const [catalogueCollapsed, setCatalogueCollapsed] = useState(false);
-
-  const filteredAlbums = searchAlbums.filter((album) => {
-    const matchesText =
-      !normalizedSearch ||
-      `${album.title} ${album.artist} ${album.genres.join(" ")}`
-        .toLowerCase()
-        .includes(normalizedSearch.toLowerCase());
-    const matchesDecade =
-      !filters.decade || Math.floor(album.year / 10) * 10 === Number(filters.decade);
-    const matchesYear = !filters.year || album.year === Number(filters.year);
-    const matchesGenre =
-      filters.genres.length === 0 ||
-      filters.genres.some((genre) => album.genres.includes(genre));
-    const matchesRating =
-      filters.minRating === 0 ||
-      (album.totalRatings > 0 && album.averageRating >= filters.minRating);
-    return matchesText && matchesDecade && matchesYear && matchesGenre && matchesRating;
-  });
 
   return (
     <>

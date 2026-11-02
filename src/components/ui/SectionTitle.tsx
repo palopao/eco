@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Icon } from "./Icon";
 
 export function SectionTitle({ children, action }: { children: ReactNode; action?: string }) {
   return (
@@ -8,5 +9,3 @@ export function SectionTitle({ children, action }: { children: ReactNode; action
     </div>
   );
 }
-
-import { Icon } from "./Icon";

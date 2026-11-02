@@ -6,23 +6,28 @@ export function AppHeader({
   title,
   onBack,
   onHome,
+  onLogo,
   action,
+  className = "",
   showSearch = false,
 }: {
   title?: string;
   onBack?: () => void;
   onHome?: () => void;
+  onLogo?: () => void;
   action?: ReactNode;
+  className?: string;
   showSearch?: boolean;
 }) {
   const rightAction = showSearch
-    ? <button className="header-icon-button" onClick={onHome} aria-label="Search"><Icon name="search" size={19} /></button>
+    ? <button className="header-icon-button" onClick={onHome ?? onLogo} aria-label="Search"><Icon name="search" size={19} /></button>
     : action;
 
   return (
     <UniversalHeader
+      className={className}
       onBack={onBack}
-      onLogo={onHome}
+      onLogo={onHome ?? onLogo}
       title={title}
       action={rightAction}
     />

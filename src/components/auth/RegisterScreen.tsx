@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { Eye, EyeOff } from "lucide-react";
 import ProfileAvatar from "../ProfileAvatar";
 import { userService } from "../../lib/services/firestore-service";
 import { requireAuth } from "../../lib/firebase";
 import { encodeProfileImage } from "../../lib/profile-image";
+import { Icon } from "../ui/Icon";
 
 export default function RegisterScreen({ setScreen }: { setScreen: (s: "home" | "login") => void }) {
   const [formData, setFormData] = useState({
@@ -126,7 +126,7 @@ export default function RegisterScreen({ setScreen }: { setScreen: (s: "home" | 
             placeholder="••••••••"
           />
           <button type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? "Hide password" : "Show password"}>
-            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            {showPassword ? <Icon name="eye-off" size={18} /> : <Icon name="eye" size={18} />}
           </button>
         </div>
 
@@ -143,7 +143,7 @@ export default function RegisterScreen({ setScreen }: { setScreen: (s: "home" | 
             placeholder="••••••••"
           />
           <button type="button" onClick={() => setShowConfirmation(!showConfirmation)} aria-label={showConfirmation ? "Hide confirmation" : "Show confirmation"}>
-            {showConfirmation ? <EyeOff size={18} /> : <Eye size={18} />}
+            {showConfirmation ? <Icon name="eye-off" size={18} /> : <Icon name="eye" size={18} />}
           </button>
         </div>
 
