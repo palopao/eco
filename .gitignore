@@ -16,7 +16,6 @@ logs/
 /.opencode-skills/
 .agents
 .claude
-.figma
 .firebase
 __pycache__
 scripts/discogs_tokens.txt
